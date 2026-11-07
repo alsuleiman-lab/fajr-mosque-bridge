@@ -133,7 +133,7 @@ class MosqueIndex:
             date = day or dt.datetime.now(ZoneInfo(record["timezone"])).date()
             return _schedule(record, date)
 
-    def search(self, query, day=None, limit=20):
+    def search(self, query, day=None, limit=20, lat=None, lng=None, radius=50000):
         needle = query.strip().casefold()
         if len(needle) < 2:
             return []
@@ -145,6 +145,11 @@ class MosqueIndex:
                 date = day or dt.datetime.now(ZoneInfo(record["timezone"])).date()
                 current = _schedule(record, date)
                 if current:
+                    if lat is not None and lng is not None:
+                        distance = distance_meters(lat, lng, record["latitude"], record["longitude"])
+                        if distance > radius:
+                            continue
+                        current = {**current, "distanceMeters": distance}
                     results.append(current)
         return results[:limit]
 

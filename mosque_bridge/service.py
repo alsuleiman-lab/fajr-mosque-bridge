@@ -84,7 +84,19 @@ def make_handler(service):
                     return self._reply(200, {"data": service.index.nearby(lat, lng, radius, day, limit)})
                 if path == "/v1/mosques":
                     term = query.get("search", [""])[0][:100]
-                    return self._reply(200, {"data": service.index.search(term, day)})
+                    lat = lng = None
+                    radius = 50000
+                    if "lat" in query or "lng" in query:
+                        lat = float(query["lat"][0])
+                        lng = float(query["lng"][0])
+                        radius = int(query.get("radius", ["50000"])[0])
+                        if not (math.isfinite(lat) and math.isfinite(lng) and -90 <= lat <= 90
+                                and -180 <= lng <= 180 and 1 <= radius <= 50000):
+                            raise ValueError("Invalid search location")
+                    limit = int(query.get("limit", ["20"])[0])
+                    if not 1 <= limit <= 20:
+                        raise ValueError("Invalid search limit")
+                    return self._reply(200, {"data": service.index.search(term, day, limit, lat, lng, radius)})
                 if path.startswith("/v1/mosques/"):
                     source_id = path.rsplit("/", 1)[-1]
                     if not source_id.isdecimal():

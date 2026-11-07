@@ -108,6 +108,28 @@ class PublicPageTests(unittest.TestCase):
                 server.shutdown()
                 server.server_close()
 
+    def test_http_name_search_with_city_location_hides_far_mosques(self):
+        with tempfile.TemporaryDirectory() as folder:
+            service = BridgeService([], Path(folder) / "cache.json")
+            berlin = parse_public_page(page(), "https://mawaqit.net/de/test", dt.date(2026, 11, 3))
+            berlin.update(id="25290", name="Al Noor Berlin", latitude=52.4875, longitude=13.3115)
+            dortmund = dict(berlin, id="18765", name="Al Noor Dortmund", latitude=51.5293, longitude=7.4634)
+            service.index.put(berlin)
+            service.index.put(dortmund)
+            server = ThreadingHTTPServer(("127.0.0.1", 0), make_handler(service))
+            thread = threading.Thread(target=server.serve_forever, daemon=True)
+            thread.start()
+            try:
+                url = (f"http://127.0.0.1:{server.server_port}/v1/mosques"
+                       "?search=Al&lat=52.4875&lng=13.3115&radius=50000&date=2026-11-03")
+                with urllib.request.urlopen(url) as response:
+                    found = json.load(response)["data"]
+                self.assertEqual([row["id"] for row in found], ["25290"])
+                self.assertLess(found[0]["distanceMeters"], 100)
+            finally:
+                server.shutdown()
+                server.server_close()
+
 
 if __name__ == "__main__":
     unittest.main()
