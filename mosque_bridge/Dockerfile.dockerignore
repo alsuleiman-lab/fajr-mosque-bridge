@@ -1,0 +1,5 @@
+*
+!mosque_bridge/
+!mosque_bridge/**
+mosque_bridge/__pycache__/
+mosque_bridge/cache.json
