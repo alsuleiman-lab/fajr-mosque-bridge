@@ -1,6 +1,6 @@
 # Fajr mosque timetable bridge
 
-This is a small, read-only service for the Fajr app. It refreshes a fixed list of public Mawaqit mosque pages every six hours and serves date-specific prayer schedules from their calendar. No user downloads or accounts are required. The initial list covers five Dortmund mosques. Add verified public page URLs to `sources.json` to expand coverage.
+This is a small, read-only service for the Fajr app. It refreshes a fixed list of public Mawaqit mosque pages every six hours and serves date-specific prayer schedules from their calendar. No user downloads or accounts are required. The configured list currently includes selected mosques in Dortmund, Berlin, and Bochum; it is not a complete directory of every mosque in those cities. Add verified public page URLs to `sources.json` to expand coverage.
 
 Run locally from the project root:
 

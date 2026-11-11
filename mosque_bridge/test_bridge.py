@@ -39,6 +39,18 @@ def page(*, updated=1792927069, broken=False):
 
 
 class PublicPageTests(unittest.TestCase):
+    def test_bochum_public_mosques_are_in_the_configured_index(self):
+        sources = json.loads(
+            (Path(__file__).with_name("sources.json")).read_text(encoding="utf-8")
+        )
+        expected = {
+            "https://mawaqit.net/en/khaled-bochum",
+            "https://mawaqit.net/de/msjd-tawba",
+            "https://mawaqit.net/ml/masjid-riyad-alsalihin-bochum-44801-germany-1",
+            "https://mawaqit.net/tr/igmg-bochum-fatih-camii-bochum-44787-germany",
+        }
+        self.assertTrue(expected.issubset(set(sources)))
+
     def test_uses_dated_calendar_not_snapshot(self):
         mosque = parse_public_page(page(), "https://mawaqit.net/en/test", dt.date(2026, 11, 3))
         self.assertEqual(mosque["effectiveTimings"]["fajr"], "05:34")
